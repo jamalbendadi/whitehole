@@ -18,9 +18,10 @@ export default function AppToaster() {
     const searchParams = useSearchParams();
     const toastName = decodeURIComponent(searchParams.get('toast[name]') ?? '');
     const toastDescription = decodeURIComponent(searchParams.get('toast[description]') ?? '');
+    console.log(searchParams)
+    console.log(pathname, toastName, toastDescription);
     
     useEffect(() => {
-        console.log('refresh')
         if (!toastName) {
             return;
         }
@@ -32,9 +33,9 @@ export default function AppToaster() {
         setTimeout(()=> {
             const newParams = clearToastSearchparams(searchParams);
             const url = `${pathname}?${newParams}`
-            router.push(url);
+            router.replace(url);
         }, 10)
-        }, [toastName, toastDescription])
+        }, [toastDescription, toastName])
     return (
         <Toaster />
     )

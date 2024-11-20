@@ -1,14 +1,15 @@
 import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import VerifyCodeForm from '@/app/auth/_forms/VerifyCodeForm';
-import { verifyCode } from '@/app/auth/actions';
+import { resendCode, verifyCode } from '@/app/auth/actions';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 
 
-export default async function VerifyCodePage ({ params,}: { params: Promise<{ slug: string }>}) {
+export default async function VerifyCodePage({ params, }: { params: Promise<{ slug: string }> }) {
     const email = (await cookies()).get('verification-email')?.value;
-    if(!email){
+    if (!email) {
         return redirect('/auth') // toast expired 
     }
     const type = (await params).slug === "email" ? "email" : "password"
@@ -25,14 +26,14 @@ export default async function VerifyCodePage ({ params,}: { params: Promise<{ sl
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
-                    {isEmailVerification && 
-                        <VerifyCodeForm type={type} onValidSubmit={verifyCode}/>
+                    {isEmailVerification &&
+                        <VerifyCodeForm type={type} onValidSubmit={verifyCode} />
                     }
                     <div className="mt-4 text-center text-sm">
                         Didn&apos;t receive a code?{" "}
-                        <a href="#" className="underline">
+                        <Button variant="link" className="underline" onClick={resendCode}>
                             Resend Code
-                        </a>
+                        </Button>
                     </div>
                 </CardContent>
             </Card>

@@ -5,7 +5,7 @@ import { permanentRedirect, redirect, RedirectType } from 'next/navigation'
 import { createClient } from '@/utils/supabase/server'
 import { AuthError, EmailOtpType } from '@supabase/supabase-js'
 import { cookies } from 'next/headers'
-import { randomUUID } from 'crypto'
+
 
 type Login = {
   email: string,
@@ -48,27 +48,68 @@ export async function signup({name, email, password, confirmPassword}: {name: st
 export async function verifyCode({email, token, type}: Verification){
   // check what type of code verifcation (through request, or supabase getUser() or through form (unsecure))
   const supabase = await createClient()
-  const { data, error } = await supabase.auth.verifyOtp({
+  const { error } = await supabase.auth.verifyOtp({
     email: email,
     token: token,
     type: 'email',
-    options: {
+    /*options: {
       redirectTo: '/?toast[name]=verified'
-    }
+    }*/
   })
-  console.log(data)
+
   if(error){
-    console.error('error verify otp')
-    console.log({...error})
+    console.error('error verifying otp');
+    console.log(error.code, error.cause, error.message);
     // Given code may have expired
-    redirect(`/?toast[name]=error&toast[description]=${error.message}`)
+    const urlParams = createSearchParams('toast', {name: 'error', description: error.message});
+    redirect(`/?${urlParams}`);
   }
 
-  redirect(`/?toast[name]=verified&[description]=Congratulations, your account is verified.`);
+  const urlParams = createSearchParams('toast', {name: 'default', description: 'Congratulations, your account is verified.'})
+  redirect(`/?${urlParams}`);
 }
 
 export async function forgotPasswordAction(){
 
+}
+
+export async function resendCode(){
+  console.log('resending');
+  const email = ((await cookies()).get('verification-email'))?.value
+  if(!email){
+    console.log('redirect: email not exist')
+    const urlParams = createSearchParams('toast', {name: 'error', description: 'Email cookie expired, try again by logging in.'})
+    return redirect(`/auth?${urlParams}`)
+  }
+
+  const supabase = await createClient()
+  const { error } = await supabase.auth.resend({
+    type: 'signup',
+    email: email,
+  })
+
+  if(error){
+    const urlParams = createSearchParams('toast', {name: 'error', description: error.message})
+    return redirect(`/auth/verify/email?${urlParams}`);
+  }
+  const urlParams = createSearchParams('toast', {name: 'default', description: 'Code has been resent!'})
+  return redirect(`/auth/verify/email?${urlParams}`);
+}
+
+function createSearchParams( type: 'toast' | 'default' = 'default', object: Record<string, any>): URLSearchParams {
+  const searchParams = new URLSearchParams();
+  
+  if (type === 'toast') {
+    Object.keys(object).forEach((k) => {
+      searchParams.set(`toast[${k}]`, object[k]?.toString() ?? '');
+    });
+    return searchParams;
+  }
+
+  Object.keys(object).forEach((k) => {
+    searchParams.set(k, object[k]?.toString() ?? '');
+  });
+  return searchParams;
 }
 
 async function loginError(error: AuthError, email: string){
@@ -79,10 +120,14 @@ async function loginError(error: AuthError, email: string){
     maxAge: 60*5
   });
   if(error.message === 'Email not confirmed'){
-    return redirect(`/auth/verify/email?toast[name]=default&toast[description]=${error.message}`);
+    const urlParams = createSearchParams('toast', {name: 'default', description: error.message})
+    return redirect(`/auth/verify/email?${urlParams}`);
   }
-  if(error.message === 'Invalid login credentials'){
-    return redirect(`/auth?toast[name]=default&toast[description]=Login not found, please sign up.` )
+  if(error.message === 'Invalid login credentials'){ // NOTE: if account is banned, supabase returns this message
+    const urlParams = createSearchParams('toast', {name: 'error', description: 'Login not found, please sign up.'})
+    return redirect(`/auth?${urlParams}` )
   }
-  return permanentRedirect(`/auth?toast[name]=error&toast[description]=Something went wrong, contact support. [${error.message}]`)
+  const urlParams = createSearchParams('toast', {name: 'error', description: `Something went wrong, contact support. [${error.message}]`})
+  return redirect(`/auth?${urlParams}`)
 }
+
