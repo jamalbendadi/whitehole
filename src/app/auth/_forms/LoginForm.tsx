@@ -26,7 +26,6 @@ export default function LoginForm({onValidSubmit}:FormProps) {
     })
 
     function onSubmit(values: LoginFormSchema) {
-        console.log(values)
         onValidSubmit(values);
     }
 

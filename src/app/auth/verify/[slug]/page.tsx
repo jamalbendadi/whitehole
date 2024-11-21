@@ -5,12 +5,13 @@ import { resendCode, verifyCode } from '@/app/auth/actions';
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Button } from '@/components/ui/button';
-
+import { createSearchParams } from '@/lib/utils';
 
 export default async function VerifyCodePage({ params, }: { params: Promise<{ slug: string }> }) {
     const email = (await cookies()).get('verification-email')?.value;
     if (!email) {
-        return redirect('/auth') // toast expired 
+        const urlParams = createSearchParams('toast', {name: 'error', description: 'Not authorized or cookie has expired'})
+        return redirect(`/auth?${urlParams}`) // toast expired 
     }
     const type = (await params).slug === "email" ? "email" : "password"
     const isEmailVerification = type === "email";

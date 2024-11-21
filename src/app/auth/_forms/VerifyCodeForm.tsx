@@ -8,12 +8,13 @@ import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
 type FormProps = {
-    type: "email" | "password";
-    onValidSubmit: ({token, email, type}: VerifyCodeFormSchema & {email: string, type: 'email'|'recovery'}) => void;
+    type: "email" | "recovery";
+    onValidSubmit: ({token, type}: VerifyCodeFormSchema) => void;
 };
 
 const formSchemaVerify = z.object({
     token: z.string().min(6, { message: 'Verification code must be at least 6 characters' }),
+    type: z.enum(['email','recovery']).default('email')
 });
 
 type VerifyCodeFormSchema = z.infer<typeof formSchemaVerify>
@@ -26,9 +27,7 @@ export default function VerifyCodeForm({ type, onValidSubmit }: FormProps) {
     });
 
     function onSubmit(values: VerifyCodeFormSchema) {
-        console.log(`${type === "email" ? "Email" : "Password"} Verification Code Submitted:`, values);
-        // Code to handle verification submission goes here
-        onValidSubmit({...values, email: 'email', type: isEmailVerification ? 'email' : 'recovery'});
+        onValidSubmit({...values, type: isEmailVerification ? 'email' : 'recovery'});
     }
 
     const isEmailVerification = type === "email";
@@ -48,6 +47,11 @@ export default function VerifyCodeForm({ type, onValidSubmit }: FormProps) {
                                 <FormMessage />
                             </FormItem>
                         )}
+                    />
+                    <FormField control={form.control} name='type'
+                            render={({field})=>(
+                                <input name={field.name} value={type} hidden readOnly/>
+                            )}
                     />
                 </div>
                 <Button type="submit" className="w-full">
