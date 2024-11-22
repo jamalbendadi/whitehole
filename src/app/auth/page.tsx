@@ -2,12 +2,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import LoginForm from '@/app/auth/_forms/LoginForm';
 import { login } from './actions';
-//import { LoginFormSchema } from '@/app/auth/forms/types';
+import Link from 'next/link';
 
 export default function LoginPage() {
-    async function onValidSubmitLoginForm(/*data: LoginFormSchema*/) {
-        //login(data)
-    }
 
     return (
         <div className="flex items-center justify-center min-h-screen bg-gray-50">
@@ -21,10 +18,10 @@ export default function LoginPage() {
                 <CardContent>
                     <LoginForm onValidSubmit={login} />
                     <div className="mt-4 text-center text-sm">
-                        Don&apos;t have an account?{" "}
-                        <a href="#" className="underline">
+                        Don&apos;t have an account?&nbsp;
+                        <Link href="/auth/register" className="underline">
                             Sign up
-                        </a>
+                        </Link>
                     </div>
                 </CardContent>
             </Card>

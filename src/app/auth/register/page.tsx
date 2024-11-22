@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import RegisterForm from '@/app/auth/_forms/RegisterForm';
 import { signup } from '@/app/auth/actions';
+import Link from 'next/link';
 
 
 export default function Register() {
@@ -17,10 +18,10 @@ export default function Register() {
                 <CardContent>
                     <RegisterForm onValidSubmit={signup}/>
                     <div className="mt-4 text-center text-sm">
-                        Already have an account?{" "}
-                        <a href="/login" className="underline">
+                        Already have an account?&nbsp;
+                        <Link href="/auth" className="underline">
                             Log in
-                        </a>
+                        </Link>
                     </div>
                 </CardContent>
             </Card>

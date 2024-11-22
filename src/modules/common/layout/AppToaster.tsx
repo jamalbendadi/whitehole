@@ -18,8 +18,6 @@ export default function AppToaster() {
     const searchParams = useSearchParams();
     const toastName = decodeURIComponent(searchParams.get('toast[name]') ?? '');
     const toastDescription = decodeURIComponent(searchParams.get('toast[description]') ?? '');
-    console.log(searchParams)
-    console.log(pathname, toastName, toastDescription);
     
     useEffect(() => {
         if (!toastName) {

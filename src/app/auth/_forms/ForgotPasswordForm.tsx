@@ -12,6 +12,7 @@ type FormProps = {
 }
 const formSchemaForgotPassword = z.object({
     email: z.string().email({ message: 'Please enter a valid email address' }),
+    captchaToken: z.string()
 });
 type ForgotPasswordFormSchema = z.infer<typeof formSchemaForgotPassword>
 
@@ -19,7 +20,8 @@ export default function ForgotPasswordForm({ onValidSubmit }: FormProps) {
     const form = useForm<ForgotPasswordFormSchema>({
         resolver: zodResolver(formSchemaForgotPassword),
         defaultValues: {
-            email: "",
+            email: '',
+            captchaToken: 'xxxxxx'
         },
     });
 
@@ -29,7 +31,6 @@ export default function ForgotPasswordForm({ onValidSubmit }: FormProps) {
     }
 
     return (
-
         <Form {...form}>
             <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid gap-2">
@@ -44,12 +45,18 @@ export default function ForgotPasswordForm({ onValidSubmit }: FormProps) {
                             </FormItem>
                         )}
                     />
+                    <FormField control={form.control} name='captchaToken'
+                        render={({ field }) => (
+                            <FormItem>
+                                <input {...field} value={'xxxxxx'} hidden readOnly/>
+                            </FormItem>
+                        )}
+                    />
                 </div>
                 <Button type="submit" className="w-full">
                     Send Reset Link
                 </Button>
             </form>
         </Form>
-
     );
 };
