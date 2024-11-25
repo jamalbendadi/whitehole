@@ -1,5 +1,5 @@
 import { createSearchParams } from '@/lib/utils'
-import { createClient } from '@/utils/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { NextRequest } from 'next/server'

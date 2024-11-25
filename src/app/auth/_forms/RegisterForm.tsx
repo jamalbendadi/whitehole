@@ -11,7 +11,7 @@ type FormProps = {
     onValidSubmit: (values: RegisterFormSchema) => void
 }
 const formSchemaRegister = z.object({
-    name: z.string().min(1, { message: 'Name is required' }),
+    username: z.string().min(1, { message: 'Name is required' }),
     email: z.string().email({ message: 'Invalid email address' }),
     password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
     confirmPassword: z.string().min(6, { message: 'Please confirm your password' })
@@ -26,7 +26,7 @@ export default function RegisterForm({onValidSubmit}:FormProps) {
     const form = useForm<RegisterFormSchema>({
         resolver: zodResolver(formSchemaRegister),
         defaultValues: {
-            name: "",
+            username: "",
             email: "",
             password: "",
             confirmPassword: ""
@@ -43,10 +43,10 @@ export default function RegisterForm({onValidSubmit}:FormProps) {
         <Form {...form}>
             <form className="grid gap-4" onSubmit={form.handleSubmit(onSubmit)}>
                 <div className="grid gap-2">
-                    <FormField control={form.control} name='name'
+                    <FormField control={form.control} name='username'
                         render={({ field }) => (
                             <FormItem>
-                                <FormLabel>Name</FormLabel>
+                                <FormLabel>Username</FormLabel>
                                 <FormControl>
                                     <Input {...field} />
                                 </FormControl>
